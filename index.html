@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de notas</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 480px; margin: 30px auto; padding: 0 12px; }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input { width: 100%; padding: 8px; box-sizing: border-box; margin-top: 4px; }
+    input[readonly] { background: #eee; }
+    button { margin-top: 20px; padding: 10px 20px; cursor: pointer; }
+    #error { color: #b00020; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Registro de notas</h1>
+
+  <form id="formNotas" action="/guardar" method="POST">
+    <label for="identificacion">Identificación</label>
+    <input type="text" id="identificacion" name="identificacion"
+           pattern="[0-9]{5,12}" title="Solo números, entre 5 y 12 dígitos" required>
+
+    <label for="nombre">Nombre del estudiante</label>
+    <input type="text" id="nombre" name="nombre" required>
+
+    <label for="materia">Materia</label>
+    <input type="text" id="materia" name="materia" required>
+
+    <label for="nota1">Nota 1 (0.0 a 5.0)</label>
+    <input type="number" id="nota1" name="nota1" min="0" max="5" step="0.01" required>
+
+    <label for="nota2">Nota 2 (0.0 a 5.0)</label>
+    <input type="number" id="nota2" name="nota2" min="0" max="5" step="0.01" required>
+
+    <label for="nota3">Nota 3 (0.0 a 5.0)</label>
+    <input type="number" id="nota3" name="nota3" min="0" max="5" step="0.01" required>
+
+    <label for="definitiva">Definitiva</label>
+    <input type="text" id="definitiva" name="definitiva" readonly>
+
+    <p id="error"></p>
+    <button type="submit">Guardar</button>
+  </form>
+
+  <script>
+    const n1 = document.getElementById('nota1');
+    const n2 = document.getElementById('nota2');
+    const n3 = document.getElementById('nota3');
+    const definitiva = document.getElementById('definitiva');
+    const error = document.getElementById('error');
+
+    function notaValida(valor) {
+      const n = parseFloat(valor);
+      return valor.trim() !== '' && !isNaN(n) && n >= 0 && n <= 5;
+    }
+
+    function calcularDefinitiva() {
+      if (notaValida(n1.value) && notaValida(n2.value) && notaValida(n3.value)) {
+        const prom = (parseFloat(n1.value) + parseFloat(n2.value) + parseFloat(n3.value)) / 3;
+        definitiva.value = prom.toFixed(2);
+      } else {
+        definitiva.value = '';
+      }
+    }
+
+    [n1, n2, n3].forEach(campo => campo.addEventListener('input', calcularDefinitiva));
+
+    document.getElementById('formNotas').addEventListener('submit', function (e) {
+      error.textContent = '';
+      if (!notaValida(n1.value) || !notaValida(n2.value) || !notaValida(n3.value)) {
+        e.preventDefault();
+        error.textContent = 'Las tres notas deben ser números entre 0.0 y 5.0.';
+      }
+    });
+  </script>
+</body>
+</html>
